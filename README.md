@@ -1,17 +1,31 @@
 # Image Repair → Upscale
 
-**先修复，再超分。** 一个把图像修复、文字保真与本地 EDSR 超分辨率串联起来的综合性 Codex skill。
+**面向 GPT Image 生成图的中文修复与高清放大。** `image-repair-upscale` 把文字核对、内容修复与本地 EDSR 超分辨率串联起来：先修复，再超分。
+
+这个 skill 的起点是两个具体需求：GPT Image 生成的图片里，中文可能出现错字、缺笔画或难以辨读的字形；图片的现有尺寸和清晰度，也可能不足以用于海报、演示或细节裁切。目标是让已有生成图更接近实际使用要求。
+
+<img src="assets/promo/01-pain-point.png" width="360" alt="GPT Image 生成图的中文错误与放大需求宣传示意">
+
+*上图为宣传示意；实际流程测试见下方夜景案例。*
 
 > 本项目糅合并改编了两个开源 skill：**[pmatos/skills 的 upscale](https://github.com/pmatos/skills/tree/main/upscale)** 与 **[bosprimigenious/image-text-restore-skill](https://github.com/bosprimigenious/image-text-restore-skill)**。它是工作流与脚本的整合，不是新训练的图像模型，也不代表两个上游项目的官方合作。
 
-The skill combines content-aware image repair and text-preserving restoration with local EDSR super-resolution. Repair first, upscale second, inspect the actual result last.
+Post-process GPT Image outputs: verify and repair Chinese text and local defects, then upscale with local EDSR. Repair first, upscale second, inspect the actual result last.
+
+## 适合什么需求
+
+- **生成图的中文有问题**：提供正确文案，核对标题、标签、公式或数值；必要时用真实字体重建重要文字，尽量保留原有布局。
+- **生成图需要更大尺寸**：对核对后的图片做 2×、3×或4×超分，或按原比例输出指定尺寸，再检查文字和细节。
+- **希望保留已有设计**：在原图基础上处理，核对构图、颜色、箭头和已有透明通道，保留原图与修复中间结果。
+
+中文修复需要明确的正确文案和宿主的编辑能力，不能依赖放大来猜出原本不可辨读的文字。具体效果仍需逐字、逐处核对。
 
 ## 为什么先修复
 
-放大错字不会把它变成正确文字，放大模糊人脸也不能确认身份。本 skill 先检查内容和布局，修复确实需要修复的区域，再对修复后的图像做神经网络超分。
+放大错字不会把它变成正确文字。本 skill 先检查生成图里的文字、布局与局部缺陷，按正确文案修复，再对核对后的图像做神经网络超分。
 
 ```text
-原图 → 检查文字、布局与局部缺陷 → 初步修复图 → EDSR 2× / 3× / 4× → 局部核对与交付
+GPT Image 生成图 → 核对中文与布局 → 修复图 → EDSR 2× / 3× / 4× → 文字与细节复核
 ```
 
 - **修复阶段**：错字使用明确的文字来源与真实字体重建；非文字局部缺陷使用宿主提供的图像编辑工具。内容已正确时可以跳过内容修改。
@@ -46,7 +60,9 @@ git clone https://github.com/GuoruiC/image-repair-upscale.git ~/.codex/skills/im
 在下一轮对话中使用；若宿主未刷新 skill 列表，重启宿主。附上图片后，例如：
 
 ```text
-用 $image-repair-upscale 先修复这张图，再放大到 4K，保留文字、布局和已有透明通道。
+用 $image-repair-upscale 处理这张 GPT Image 生成图。
+标题应为「中文修复与高清放大」，请先按这份正确文案修复中文，
+再按原比例放大到宽 3840 像素，保留布局和已有透明通道，最后逐字核对。
 ```
 
 单独对已修复的图片运行本地超分：
@@ -60,9 +76,17 @@ uv run --python 3.12 --script ./scripts/upscale_image.py ./repaired.png --factor
 
 超分脚本无需图像 API 密钥。局部生成式修复需要宿主的图像编辑能力；本项目没有把普通 Pillow 锐化冒充成自动语义修复。
 
-## 夜景测试案例
+## 宣传视频素材
 
-以下是示例提供者明确授权本次公开的实际测试。输入是一张低分辨率夜景照片，先通过宿主内置图像编辑生成初步修复图，再分别运行本地 **EDSR_x2** 和 **EDSR_x4**。2×与4×都以同一张初步修复图为输入，不是连续串联两次放大。
+已提供四张竖版宣传图，按“痛点 → 中文修复 → EDSR 超分 → 项目入口”组织，可作为小红书、抖音介绍视频的静帧素材。查看[图片、使用顺序与配音建议](assets/promo/README.md)及[生成提示词](assets/promo/prompts.md)。
+
+这些图是 AI 生成的宣传示意，未作为本 skill 的输入与输出进行效果测试；文字修复与超分效果应以真实处理记录为准。
+
+## 补充流程示例：随机夜景照片
+
+这张夜景照片是随机选取的流程测试输入，不是 GPT Image 中文纠错案例，也不用于证明中文修复效果。它展示了“修复 → 本地超分 → 尺寸核对”的实际执行过程，示例提供者已明确授权公开。
+
+先通过宿主内置图像编辑生成初步修复图，再分别运行本地 **EDSR_x2** 和 **EDSR_x4**。2×与4×都以同一张初步修复图为输入，不是连续串联两次放大。
 
 | 阶段 | 实际尺寸 | 方法 |
 |---|---|---|
@@ -115,6 +139,7 @@ scripts/enhance_raster.py     可选常规增强基线
 references/diagram-restoration.md
 tests/test_pipeline.py        可运行的功能检查
 examples/night-street/        授权公开的初步、2×、4×案例
+assets/promo/                宣传视频图片、配音建议与提示词
 ```
 
-代码与改编文档使用 [MIT License](LICENSE)。示例图片由提供者授权本次公开展示；代码的 MIT 许可不自动扩展为示例照片的再许可。
+代码与改编文档使用 [MIT License](LICENSE)。夜景示例图片由提供者授权本次公开展示；代码的 MIT 许可不自动扩展为示例照片的再许可。宣传图为本项目通过内置图像生成工具制作的 AI 生成素材。
