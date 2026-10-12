@@ -1,0 +1,41 @@
+{
+  "example": "night-street",
+  "date": "2026-10-12",
+  "scale_reference": "initial-repair.png",
+  "transparency": "input is opaque RGB; the full night background is preserved",
+  "limitations": "AI reconstructed detail is not verified original information; faces and signs remain indistinct",
+  "images": [
+    {
+      "file": "original.png",
+      "width": 502,
+      "height": 324,
+      "method": "unmodified test input",
+      "sha256": "d037da152d7a4ae16d2d1e278726357683fabb2349f541e033ea9782d91a57b8",
+      "preview": "original-preview.jpg"
+    },
+    {
+      "file": "initial-repair.png",
+      "width": 1561,
+      "height": 1007,
+      "method": "built-in image editing",
+      "sha256": "182c1f247f3f4e2b61dd7e218ff036e48340955fb3ea3f05b8a7109a685dfcab",
+      "preview": "initial-repair-preview.jpg"
+    },
+    {
+      "file": "upscaled-2x.png",
+      "width": 3122,
+      "height": 2014,
+      "method": "EDSR_x2 from initial-repair.png",
+      "sha256": "67b477f01810023122ff34ae6e056820c94cb5fb70ab68d7af25c673a9969214",
+      "preview": "upscaled-2x-preview.jpg"
+    },
+    {
+      "file": "upscaled-4x.png",
+      "width": 6244,
+      "height": 4028,
+      "method": "EDSR_x4 from initial-repair.png",
+      "sha256": "f93f2eabd2ef284bf0622b4eba01dcc623440c633e67a5df068127f0dd3e3439",
+      "preview": "upscaled-4x-preview.jpg"
+    }
+  ]
+}

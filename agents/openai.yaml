@@ -1,0 +1,4 @@
+interface:
+  display_name: "图像修复与超分"
+  short_description: "先核对并修复文字和局部细节，再进行本地 EDSR 超分辨率放大"
+  default_prompt: "Use $image-repair-upscale to repair this image first, then upscale it while preserving its text, composition, and transparency."
